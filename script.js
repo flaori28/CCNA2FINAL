@@ -54,7 +54,7 @@ function getAnsweredQuestionCount(questions, answers) {
 
 function validateSavedProgress(progress) {
     if (!progress || progress.version !== 1
-        || ![40, 60].includes(progress.seriesSize)
+        || ![10, 40, 60].includes(progress.seriesSize)
         || !['immediate', 'end'].includes(progress.mode)
         || !Array.isArray(progress.questionIds)
         || progress.questionIds.length !== progress.seriesSize
@@ -246,7 +246,7 @@ function drawQuestions(count) {
 }
 
 function startQuiz(seriesSize, mode) {
-    if (![40, 60].includes(Number(seriesSize)) || !['immediate', 'end'].includes(mode)) {
+    if (![10, 40, 60].includes(Number(seriesSize)) || !['immediate', 'end'].includes(mode)) {
         showDataError('Le format de cette série n’est pas disponible.');
         return;
     }
@@ -651,6 +651,18 @@ function showMenu() {
     window.scrollTo(0, 0);
 }
 
+function selectSeriesTab(selectedTab) {
+    document.querySelectorAll('[data-series-tab]').forEach(tab => {
+        const isSelected = tab.dataset.seriesTab === selectedTab;
+        tab.classList.toggle('active', isSelected);
+        tab.setAttribute('aria-selected', String(isSelected));
+        tab.tabIndex = isSelected ? 0 : -1;
+    });
+
+    document.getElementById('panel-long-series').classList.toggle('hidden', selectedTab !== 'long');
+    document.getElementById('panel-short-series').classList.toggle('hidden', selectedTab !== 'short');
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     if (typeof allQuestions === 'undefined' || !Array.isArray(allQuestions)) {
         showDataError('Le fichier de questions est introuvable ou invalide.');
@@ -659,8 +671,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
     questionPool.push(...shuffle(allQuestions));
     document.getElementById('question-bank-note').textContent =
-        `${allQuestions.length} questions disponibles. Les séries de 40 ou 60 questions les parcourent sans répétition avant un nouveau tour.`;
+        `${allQuestions.length} questions disponibles. Les séries parcourent la banque sans répétition avant un nouveau tour.`;
 
+    document.querySelectorAll('[data-series-tab]').forEach((tab, index, tabs) => {
+        tab.tabIndex = index === 0 ? 0 : -1;
+        tab.addEventListener('click', () => selectSeriesTab(tab.dataset.seriesTab));
+        tab.addEventListener('keydown', event => {
+            const currentIndex = [...tabs].indexOf(tab);
+            let nextIndex;
+            if (event.key === 'ArrowRight') {
+                nextIndex = (currentIndex + 1) % tabs.length;
+            } else if (event.key === 'ArrowLeft') {
+                nextIndex = (currentIndex - 1 + tabs.length) % tabs.length;
+            } else if (event.key === 'Home') {
+                nextIndex = 0;
+            } else if (event.key === 'End') {
+                nextIndex = tabs.length - 1;
+            }
+            if (nextIndex !== undefined) {
+                event.preventDefault();
+                tabs[nextIndex].focus();
+                selectSeriesTab(tabs[nextIndex].dataset.seriesTab);
+            }
+        });
+    });
     document.querySelectorAll('.format-option').forEach(button => {
         button.addEventListener('click', () =>
             startQuiz(button.dataset.size, button.dataset.mode)

@@ -12,7 +12,7 @@
     <div class="container">
         <header>
             <h1><i class="fas fa-network-wired"></i> Examen Final CCNA 2 SRWE</h1>
-            <p>Entraînement officiel v7.0 - Séries de 40 ou 60 questions</p>
+            <p>Entraînement officiel v7.0 - Séries de 10, 40 ou 60 questions</p>
         </header>
 
         <!-- Menu de sélection des séries -->
@@ -31,7 +31,18 @@
                 </div>
             </section>
             <p id="autosave-status" class="autosave-status" role="status" aria-live="polite"></p>
-            <div class="format-grid">
+            <div class="series-tabs" role="tablist" aria-label="Choisir la longueur des séries">
+                <button id="tab-long-series" class="series-tab active" type="button" role="tab"
+                    aria-selected="true" aria-controls="panel-long-series" data-series-tab="long">
+                    Séries de 40 ou 60
+                </button>
+                <button id="tab-short-series" class="series-tab" type="button" role="tab"
+                    aria-selected="false" aria-controls="panel-short-series" data-series-tab="short">
+                    Séries de 10
+                </button>
+            </div>
+            <div id="panel-long-series" class="series-tab-panel" role="tabpanel" aria-labelledby="tab-long-series">
+                <div class="format-grid">
                 <section class="format-group">
                     <h3>Correction au fur et à mesure</h3>
                     <p>Vérifie chaque réponse et découvre l’explication avant de continuer.</p>
@@ -60,6 +71,31 @@
                         </button>
                     </div>
                 </section>
+            </div>
+            </div>
+            <div id="panel-short-series" class="series-tab-panel hidden" role="tabpanel" aria-labelledby="tab-short-series">
+                <div class="format-grid">
+                    <section class="format-group">
+                        <h3>Correction au fur et à mesure</h3>
+                        <p>Vérifie chaque réponse et découvre l’explication avant de continuer.</p>
+                        <div class="format-options">
+                            <button class="btn-series format-option" type="button" data-size="10" data-mode="immediate">
+                                10 questions
+                                <span>Correction après chaque réponse</span>
+                            </button>
+                        </div>
+                    </section>
+                    <section class="format-group">
+                        <h3>Correction à la fin</h3>
+                        <p>Réponds aux dix questions, puis consulte le corrigé complet.</p>
+                        <div class="format-options">
+                            <button class="btn-series format-option" type="button" data-size="10" data-mode="end">
+                                10 questions
+                                <span>Résultat et corrigé à la fin</span>
+                            </button>
+                        </div>
+                    </section>
+                </div>
             </div>
         </div>
 
