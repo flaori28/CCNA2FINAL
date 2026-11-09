@@ -28,7 +28,7 @@
         "options": [],
         "correct": [],
         "explanation":  "Lorsque le routeur actif HSRP tombe en panne, le routeur de secours cesse de recevoir les paquets Hello. Il passe alors à l'état actif et prend en charge le trafic destiné à l'adresse virtuelle.",
-        "image":  null
+        "image":  "https://ccnareponses.com/wp-content/uploads/2021/12/2024-10-16_102955.jpg"
     },
     {
         "id":  3,
@@ -200,7 +200,10 @@
         "options": [],
         "correct": [],
         "explanation":  "Explication : Un VLAN de données est configuré pour transporter le trafic généré par l’utilisateur. Un VLAN par défaut est le VLAN auquel appartiennent tous les ports de commutateur après le démarrage initial d’un commutateur chargeant la configuration par défaut. Un VLAN natif est affecté à un port de jonction 802.1Q et le trafic non balisé y est placé. Un VLAN de gestion est tout VLAN configuré pour accéder aux capacités de gestion d’un commutateur.",
-        "image":  null
+        "image":  [
+            "https://ccnareponses.com/wp-content/uploads/2021/12/2021-12-03_222545.jpg",
+            "https://ccnareponses.com/wp-content/uploads/2021/12/2024-10-15_185331.jpg"
+        ]
     },
     {
         "id":  13,
@@ -232,7 +235,7 @@
         "options": [],
         "correct": [],
         "explanation":  "1. Admin Down: Interface shutdown. 2. Layer 1 Issue: Câble débranché/mauvais type. 3. Layer 2 Issue: Mismatched encapsulation/clock rate/keepalives. 4. Operational: Tout fonctionne.",
-        "image":  null
+        "image":  "https://ccnareponses.com/wp-content/uploads/2021/12/2024-10-15_201613.jpg"
     },
     {
         "id":  15,
@@ -398,7 +401,7 @@
         "options": [],
         "correct": [],
         "explanation":  "Le processus suit DORA : Discover -> Offer -> Request -> Acknowledge.",
-        "image":  null
+        "image":  "https://ccnareponses.com/wp-content/uploads/2021/12/2024-10-15_161502.jpg"
     },
     {
         "id":  25,
@@ -2278,7 +2281,7 @@
         "options": [],
         "correct": [],
         "explanation":  "Le processus DHCP comprend 4 étapes : Discover (Client cherche Serveur), Offer (Serveur propose IP), Request (Client demande IP), Acknowledge (Serveur valide).",
-        "image":  null
+        "image":  "https://ccnareponses.com/wp-content/uploads/2022/06/2020-01-20_232028.jpg"
     },
     {
         "id":  139,
@@ -2328,7 +2331,7 @@
         "options": [],
         "correct": [],
         "explanation":  "1. DHCPDISCOVER (Client cherche). 2. DHCPOFFER (Serveur offre). 3. DHCPREQUEST (Client accepte/demande). 4. DHCPACK (Serveur valide).",
-        "image":  null
+        "image":  "https://ccnareponses.com/wp-content/uploads/2021/12/2020-01-20_225135-1.jpg"
     },
     {
         "id":  142,

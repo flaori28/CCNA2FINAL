@@ -1,4 +1,3 @@
-...existing code...
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -13,61 +12,79 @@
     <div class="container">
         <header>
             <h1><i class="fas fa-network-wired"></i> Examen Final CCNA 2 SRWE</h1>
-            <p>Entraînement officiel v7.0 - Séries de 10 Questions</p>
+            <p>Entraînement officiel v7.0 - Séries de 40 ou 60 questions</p>
         </header>
 
         <!-- Menu de sélection des séries -->
         <div id="menu-container" class="menu-screen">
-            <h2>Choisissez une série d'entraînement :</h2>
-            <div class="series-grid">
-                <button class="btn-series" onclick="startQuiz(1)">
-                    <i class="fas fa-list-ol"></i> Série 1
-                    <span>10 Questions</span>
-                </button>
-                <button class="btn-series" onclick="startQuiz(2)">
-                    <i class="fas fa-list-ol"></i> Série 2
-                    <span>10 Questions</span>
-                </button>
-                <button class="btn-series" onclick="startQuiz(3)">
-                    <i class="fas fa-list-ol"></i> Série 3
-                    <span>10 Questions</span>
-                </button>
-                <button class="btn-series" onclick="startQuiz(4)">
-                    <i class="fas fa-list-ol"></i> Série 4
-                    <span>10 Questions</span>
-                </button>
-                <button class="btn-series" onclick="startQuiz(5)">
-                    <i class="fas fa-list-ol"></i> Série 5
-                    <span>10 Questions</span>
-                </button>
-                <button class="btn-series" onclick="startQuiz(6)">
-                    <i class="fas fa-list-ol"></i> Série 6
-                    <span>10 Questions</span>
-                </button>
+            <h2>Choisis ton format d’entraînement</h2>
+            <p id="question-bank-note" class="question-bank-note"></p>
+            <section id="resume-panel" class="resume-panel hidden" aria-labelledby="resume-title">
+                <div>
+                    <h3 id="resume-title">Ta progression sauvegardée</h3>
+                    <p id="resume-summary"></p>
+                    <progress id="resume-progress-bar" max="100" value="0" aria-label="Progression sauvegardée"></progress>
+                </div>
+                <div class="resume-actions">
+                    <button id="resume-btn" class="btn-submit" type="button">Reprendre ma série</button>
+                    <button id="clear-progress-btn" class="btn-reset" type="button">Effacer la sauvegarde</button>
+                </div>
+            </section>
+            <p id="autosave-status" class="autosave-status" role="status" aria-live="polite"></p>
+            <div class="format-grid">
+                <section class="format-group">
+                    <h3>Correction au fur et à mesure</h3>
+                    <p>Vérifie chaque réponse et découvre l’explication avant de continuer.</p>
+                    <div class="format-options">
+                        <button class="btn-series format-option" type="button" data-size="40" data-mode="immediate">
+                            40 questions
+                            <span>Correction après chaque réponse</span>
+                        </button>
+                        <button class="btn-series format-option" type="button" data-size="60" data-mode="immediate">
+                            60 questions
+                            <span>Correction après chaque réponse</span>
+                        </button>
+                    </div>
+                </section>
+                <section class="format-group">
+                    <h3>Correction à la fin</h3>
+                    <p>Réponds à toute la série, puis consulte le corrigé complet.</p>
+                    <div class="format-options">
+                        <button class="btn-series format-option" type="button" data-size="40" data-mode="end">
+                            40 questions
+                            <span>Résultat et corrigé à la fin</span>
+                        </button>
+                        <button class="btn-series format-option" type="button" data-size="60" data-mode="end">
+                            60 questions
+                            <span>Résultat et corrigé à la fin</span>
+                        </button>
+                    </div>
+                </section>
             </div>
         </div>
 
-        <!-- Zone du Quiz (Chachée par défaut) -->
+        <!-- Zone du quiz -->
         <form id="quiz-form" class="hidden">
             <h2 id="quiz-title" class="series-title">Série X</h2>
-            
+            <p id="question-progress" class="question-progress"></p>
+            <progress id="quiz-progress-bar" class="quiz-progress-bar" max="100" value="0" aria-label="Progression de la série"></progress>
+            <p id="quiz-save-status" class="autosave-status" role="status" aria-live="polite"></p>
             <div id="questions-container">
-                <!-- Les questions seront générées ici par JavaScript -->
             </div>
 
-            <!-- Actions -->
-            <div class="actions">
-                <button type="button" id="submit-btn" class="btn-submit">Valider mes réponses</button>
-                <button type="button" onclick="showMenu()" class="btn-reset">Retour au menu</button>
+            <div id="quiz-navigation" class="actions quiz-navigation">
+                <button type="button" id="previous-btn" class="btn-reset hidden">Question précédente</button>
+                <button type="button" id="verify-btn" class="btn-submit hidden">Vérifier ma réponse</button>
+                <button type="button" id="next-btn" class="btn-submit hidden">Question suivante</button>
+                <button type="button" id="submit-btn" class="btn-submit hidden">Terminer et voir le corrigé</button>
+                <button type="button" onclick="showMenu()" class="btn-reset">Quitter la série</button>
             </div>
-            
-            <!-- Result Area -->
+
             <div id="result-area" class="result hidden">
                 <h3>Votre score : <span id="score-val">0</span> / <span id="total-val">0</span></h3>
                 <p id="result-msg"></p>
-                <!-- <button type="button" onclick="retryQuiz()" class="btn-retry">Réessayer cette série</button> -->
+                <button type="button" onclick="showMenu()" class="btn-reset">Choisir une autre série</button>
             </div>
-
         </form>
         
         <footer>
@@ -75,7 +92,7 @@
         </footer>
     </div>
 
-    <script src="quiz_data_full.js"></script>
+    <script src="quiz_data.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
