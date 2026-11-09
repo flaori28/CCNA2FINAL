@@ -43,59 +43,54 @@
             </div>
             <div id="panel-long-series" class="series-tab-panel" role="tabpanel" aria-labelledby="tab-long-series">
                 <div class="format-grid">
-                <section class="format-group">
-                    <h3>Correction au fur et à mesure</h3>
-                    <p>Vérifie chaque réponse et découvre l’explication avant de continuer.</p>
-                    <div class="format-options">
-                        <button class="btn-series format-option" type="button" data-size="40" data-mode="immediate">
-                            40 questions
-                            <span>Correction après chaque réponse</span>
-                        </button>
-                        <button class="btn-series format-option" type="button" data-size="60" data-mode="immediate">
-                            60 questions
-                            <span>Correction après chaque réponse</span>
-                        </button>
-                    </div>
-                </section>
-                <section class="format-group">
-                    <h3>Correction à la fin</h3>
-                    <p>Réponds à toute la série, puis consulte le corrigé complet.</p>
-                    <div class="format-options">
-                        <button class="btn-series format-option" type="button" data-size="40" data-mode="end">
-                            40 questions
-                            <span>Résultat et corrigé à la fin</span>
-                        </button>
-                        <button class="btn-series format-option" type="button" data-size="60" data-mode="end">
-                            60 questions
-                            <span>Résultat et corrigé à la fin</span>
-                        </button>
-                    </div>
-                </section>
-            </div>
-            </div>
-            <div id="panel-short-series" class="series-tab-panel hidden" role="tabpanel" aria-labelledby="tab-short-series">
-                <div class="format-grid">
                     <section class="format-group">
                         <h3>Correction au fur et à mesure</h3>
                         <p>Vérifie chaque réponse et découvre l’explication avant de continuer.</p>
                         <div class="format-options">
-                            <button class="btn-series format-option" type="button" data-size="10" data-mode="immediate">
-                                10 questions
+                            <button class="btn-series format-option" type="button" data-size="40" data-mode="immediate">
+                                40 questions
+                                <span>Correction après chaque réponse</span>
+                            </button>
+                            <button class="btn-series format-option" type="button" data-size="60" data-mode="immediate">
+                                60 questions
                                 <span>Correction après chaque réponse</span>
                             </button>
                         </div>
                     </section>
                     <section class="format-group">
                         <h3>Correction à la fin</h3>
-                        <p>Réponds aux dix questions, puis consulte le corrigé complet.</p>
+                        <p>Réponds à toute la série, puis consulte le corrigé complet.</p>
                         <div class="format-options">
-                            <button class="btn-series format-option" type="button" data-size="10" data-mode="end">
-                                10 questions
+                            <button class="btn-series format-option" type="button" data-size="40" data-mode="end">
+                                40 questions
+                                <span>Résultat et corrigé à la fin</span>
+                            </button>
+                            <button class="btn-series format-option" type="button" data-size="60" data-mode="end">
+                                60 questions
                                 <span>Résultat et corrigé à la fin</span>
                             </button>
                         </div>
                     </section>
                 </div>
+            </div>
+            <div id="panel-short-series" class="series-tab-panel hidden" role="tabpanel" aria-labelledby="tab-short-series">
+                <section class="series-picker">
+                    <label for="series-mode-select">Mode de correction</label>
+                    <select id="series-mode-select">
+                        <option value="immediate">Correction après chaque réponse</option>
+                        <option value="end">Corrigé complet à la fin</option>
+                    </select>
+                </section>
+                <section class="series-list-section" aria-labelledby="numbered-series-title">
+                    <h3 id="numbered-series-title">Toutes les séries</h3>
+                    <p>Les séries 1 à 16 contiennent 10 questions. La dernière contient les 11 questions restantes.</p>
+                    <div id="numbered-series-grid" class="numbered-series-grid"></div>
+                </section>
+                <section class="series-list-section" aria-labelledby="themed-series-title">
+                    <h3 id="themed-series-title">S’entraîner par thème</h3>
+                    <p>Chaque thème rassemble les questions correspondantes de la banque. Certaines questions peuvent apparaître dans plusieurs thèmes.</p>
+                    <div id="themed-series-grid" class="themed-series-grid"></div>
+                </section>
             </div>
         </div>
 

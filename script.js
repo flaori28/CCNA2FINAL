@@ -1,11 +1,63 @@
 const questionPool = [];
 const PROGRESS_STORAGE_KEY = 'ccna2final-progress-v1';
+const QUESTION_THEMES = [
+    {
+        key: 'vlan-intervlan',
+        title: 'VLAN et routage inter-VLAN',
+        description: 'VLAN, trunks, interfaces SVI et communication entre VLAN.',
+        patterns: [/\bvlan\b|inter.?vlan|\bsvi\b|\btrunk\b|802\.1q|router.on.a.stick|sous.interface/]
+    },
+    {
+        key: 'stp-etherchannel',
+        title: 'STP et EtherChannel',
+        description: 'Spanning Tree, pont racine, BPDU et agrégation de liens.',
+        patterns: [/\bstp\b|\brstp\b|\bpvst\b|spanning.tree|\bbpdu\b|etherchannel|\blacp\b|\bpagp\b|port.channel|pont racine/]
+    },
+    {
+        key: 'routing',
+        title: 'Routage et passerelles',
+        description: 'Routes statiques et dynamiques, routage IPv4/IPv6 et passerelles.',
+        patterns: [/rout(?:e|age|eur|ing)|\bospf\b|\brip\b|\bhsrp\b|\bfhrp\b|passerelle|gateway|next.hop|troncon suivant|route par defaut|route statique|route dynamique/]
+    },
+    {
+        key: 'dhcp-addressing',
+        title: 'DHCP et adressage IP',
+        description: 'DHCP, IPv4/IPv6, sous-réseaux et services d’adressage.',
+        patterns: [/\bdhcp\b|\bipv[46]\b|adresse ip|sous.?reseau|masque|prefixe|adressage|\barp\b|\bdns\b|adresse mac/]
+    },
+    {
+        key: 'wireless',
+        title: 'Wi-Fi et WLAN',
+        description: 'Réseaux sans fil, normes 802.11, points d’accès et contrôleurs.',
+        patterns: [/wi.?fi|sans.fil|\bwlan\b|802\.11|point d.?acces|\bssid\b|wireless|\bwlc\b|controleur sans fil/]
+    },
+    {
+        key: 'security',
+        title: 'Sécurité réseau',
+        description: 'Sécurité des ports, contrôle d’accès et protection du réseau.',
+        patterns: [/securit|port.security|\bdai\b|\bipsg\b|dhcp snooping|\bacl\b|authentification|\bssh\b|attaque|mac flooding|bpdu guard/]
+    },
+    {
+        key: 'switching-ethernet',
+        title: 'Commutation et Ethernet',
+        description: 'Commutateurs, trames, adresses MAC et caractéristiques Ethernet.',
+        patterns: [/commutat|commutateur|\bswitch\b|trame|\bmac\b|couche 2|couche 3|duplex|bande passante|congestion|transmission|monodiffusion|diffusion|unicast|broadcast|multicast/]
+    },
+    {
+        key: 'other',
+        title: 'Autres notions réseau',
+        description: 'Questions transversales qui ne relèvent pas d’un thème unique.',
+        patterns: []
+    }
+];
 let currentQuestions = [];
 let currentAnswers = [];
 let currentResults = [];
 let currentQuestionIndex = 0;
 let currentMode = 'end';
 let currentSeriesSize = 40;
+let currentThemeKey = null;
+let currentQuizLabel = '';
 let completed = false;
 
 function shuffle(items) {
@@ -52,9 +104,45 @@ function getAnsweredQuestionCount(questions, answers) {
             && hasCompleteAnswer(question, answers[index]) ? 1 : 0), 0);
 }
 
+function getQuestionThemes(question) {
+    const normalizeText = text => text.normalize('NFD')
+        .replace(/\p{Diacritic}/gu, '')
+        .toLowerCase();
+    const prompt = normalizeText([
+        question.question,
+        ...(question.match_pairs || []).flatMap(pair => [pair.term, pair.definition])
+    ].join(' '));
+    const options = normalizeText((question.options || []).join(' '));
+    const matches = QUESTION_THEMES.filter(theme => theme.key !== 'other'
+        && theme.patterns.some(pattern => pattern.test(prompt))).map(theme => theme.key);
+    if (matches.length) {
+        return matches;
+    }
+
+    const optionMatches = QUESTION_THEMES.filter(theme => theme.key !== 'other'
+        && theme.patterns.some(pattern => pattern.test(options))).map(theme => theme.key);
+    if (optionMatches.length) {
+        return optionMatches;
+    }
+
+    return ['other'];
+}
+
+function getNumberedSeries() {
+    const questions = [...allQuestions].sort((first, second) => first.id - second.id);
+    const series = [];
+    for (let index = 0; index < questions.length; index += 10) {
+        series.push(questions.slice(index, index + 10));
+    }
+
+    if (series.length > 1 && series[series.length - 1].length === 1) {
+        series[series.length - 2].push(...series.pop());
+    }
+    return series;
+}
+
 function validateSavedProgress(progress) {
     if (!progress || progress.version !== 1
-        || ![10, 40, 60].includes(progress.seriesSize)
         || !['immediate', 'end'].includes(progress.mode)
         || !Array.isArray(progress.questionIds)
         || progress.questionIds.length !== progress.seriesSize
@@ -73,10 +161,23 @@ function validateSavedProgress(progress) {
     const questionsById = new Map(allQuestions.map(question => [question.id, question]));
     const questions = progress.questionIds.map(id => questionsById.get(id));
     const remainingQuestions = progress.remainingIds.map(id => questionsById.get(id));
+    const themeKey = progress.themeKey || null;
+    const quizLabel = progress.quizLabel
+        || `Série de ${progress.seriesSize} questions`;
+    const validTheme = themeKey === null
+        || QUESTION_THEMES.some(theme => theme.key === themeKey);
+    const validSeriesSize = themeKey
+        ? questions.length > 0
+        : [10, 11, 40, 60].includes(progress.seriesSize);
     if (questions.some(question => !question)
         || remainingQuestions.some(question => !question)
+        || !validTheme
+        || !validSeriesSize
+        || (progress.quizLabel !== undefined && typeof progress.quizLabel !== 'string')
         || new Set(progress.remainingIds).size !== progress.remainingIds.length
-        || progress.remainingIds.some(id => progress.questionIds.includes(id))) {
+        || progress.remainingIds.some(id => progress.questionIds.includes(id))
+        || (themeKey && questions.some(question =>
+            !getQuestionThemes(question).includes(themeKey)))) {
         return null;
     }
 
@@ -106,7 +207,7 @@ function validateSavedProgress(progress) {
         return null;
     }
 
-    return { ...progress, questions, remainingQuestions };
+    return { ...progress, themeKey, quizLabel, questions, remainingQuestions };
 }
 
 function readSavedProgress() {
@@ -164,7 +265,7 @@ function renderSavedProgress() {
         ? new Date(progress.savedAt).toLocaleString()
         : 'heure inconnue';
     document.getElementById('resume-summary').textContent =
-        `Série de ${progress.seriesSize} questions, ${answered} réponse${answered > 1 ? 's' : ''} enregistrée${answered > 1 ? 's' : ''}. Question ${progress.questionIndex + 1} sur ${progress.seriesSize}. Dernière sauvegarde : ${savedAt}.`;
+        `${progress.quizLabel} · ${answered} réponse${answered > 1 ? 's' : ''} enregistrée${answered > 1 ? 's' : ''}. Question ${progress.questionIndex + 1} sur ${progress.seriesSize}. Dernière sauvegarde : ${savedAt}.`;
     document.getElementById('resume-progress-bar').value = percentage;
     panel.classList.remove('hidden');
 }
@@ -178,6 +279,8 @@ function persistProgress() {
         version: 1,
         seriesSize: currentSeriesSize,
         mode: currentMode,
+        themeKey: currentThemeKey,
+        quizLabel: currentQuizLabel,
         questionIds: currentQuestions.map(question => question.id),
         remainingIds: questionPool.map(question => question.id),
         answers: currentAnswers,
@@ -215,6 +318,8 @@ function resumeQuiz() {
 
     currentSeriesSize = progress.seriesSize;
     currentMode = progress.mode;
+    currentThemeKey = progress.themeKey;
+    currentQuizLabel = progress.quizLabel;
     currentQuestions = progress.questions;
     currentAnswers = progress.answers;
     currentResults = progress.results;
@@ -223,7 +328,7 @@ function resumeQuiz() {
     completed = false;
 
     document.getElementById('quiz-title').textContent =
-        `Série de ${currentSeriesSize} questions — ${currentMode === 'immediate' ? 'correction au fur et à mesure' : 'correction à la fin'}`;
+        `${currentQuizLabel} — ${currentMode === 'immediate' ? 'correction au fur et à mesure' : 'correction à la fin'}`;
     document.getElementById('result-area').classList.add('hidden');
     document.getElementById('menu-container').classList.add('hidden');
     document.getElementById('quiz-form').classList.remove('hidden');
@@ -245,15 +350,84 @@ function drawQuestions(count) {
     return questions;
 }
 
-function startQuiz(seriesSize, mode) {
-    if (![10, 40, 60].includes(Number(seriesSize)) || !['immediate', 'end'].includes(mode)) {
+function renderNumberedSeries() {
+    const container = document.getElementById('numbered-series-grid');
+    getNumberedSeries().forEach((questions, index) => {
+        const button = document.createElement('button');
+        const title = `Série ${index + 1}`;
+        button.type = 'button';
+        button.className = 'numbered-series-button';
+        button.textContent = `${title} · ${questions.length} questions`;
+        button.addEventListener('click', () => {
+            const mode = document.getElementById('series-mode-select').value;
+            startQuiz(questions.length, mode, { questions, title });
+        });
+        container.appendChild(button);
+    });
+}
+
+function renderThemedSeries() {
+    const container = document.getElementById('themed-series-grid');
+    const themedQuestions = new Map(QUESTION_THEMES.map(theme => [theme.key, []]));
+    allQuestions.forEach(question => {
+        getQuestionThemes(question).forEach(themeKey => themedQuestions.get(themeKey).push(question));
+    });
+
+    QUESTION_THEMES.forEach(theme => {
+        const questions = themedQuestions.get(theme.key);
+        if (!questions.length) {
+            return;
+        }
+
+        const card = document.createElement('article');
+        card.className = 'themed-series-card';
+        const heading = document.createElement('h4');
+        heading.textContent = theme.title;
+        const description = document.createElement('p');
+        description.textContent = `${theme.description} ${questions.length} questions.`;
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'btn-submit';
+        button.textContent = 'Commencer ce thème';
+        button.addEventListener('click', () => {
+            const mode = document.getElementById('series-mode-select').value;
+            startQuiz(questions.length, mode, {
+                questions,
+                title: `${theme.title} · ${questions.length} questions`,
+                themeKey: theme.key
+            });
+        });
+        card.append(heading, description, button);
+        container.appendChild(card);
+    });
+}
+
+function startQuiz(seriesSize, mode, selection = {}) {
+    const requestedSize = Number(seriesSize);
+    const hasFixedQuestions = Array.isArray(selection.questions);
+    const validSelection = hasFixedQuestions
+        ? selection.questions.length === requestedSize
+            && requestedSize > 0
+            && new Set(selection.questions.map(question => question.id)).size === requestedSize
+            && selection.questions.every(question => allQuestions.some(item => item.id === question.id))
+        : [10, 40, 60].includes(requestedSize);
+    if (!validSelection || !['immediate', 'end'].includes(mode)) {
         showDataError('Le format de cette série n’est pas disponible.');
         return;
     }
 
-    currentSeriesSize = Number(seriesSize);
+    currentQuestions = hasFixedQuestions
+        ? [...selection.questions]
+        : drawQuestions(requestedSize);
+    const selectedIds = new Set(currentQuestions.map(question => question.id));
+    if (hasFixedQuestions) {
+        questionPool.splice(0, questionPool.length,
+            ...questionPool.filter(question => !selectedIds.has(question.id)));
+    }
+    currentSeriesSize = currentQuestions.length;
     currentMode = mode;
-    currentQuestions = drawQuestions(currentSeriesSize);
+    currentThemeKey = selection.themeKey || null;
+    currentQuizLabel = selection.title || `Série de ${currentSeriesSize} questions`;
     currentAnswers = Array(currentQuestions.length).fill(null);
     currentResults = currentQuestions.map(question =>
         isQuestionAnswerable(question) ? null : 'skipped'
@@ -262,7 +436,7 @@ function startQuiz(seriesSize, mode) {
     completed = false;
 
     document.getElementById('quiz-title').textContent =
-        `Série de ${currentSeriesSize} questions — ${mode === 'immediate' ? 'correction au fur et à mesure' : 'correction à la fin'}`;
+        `${currentQuizLabel} — ${mode === 'immediate' ? 'correction au fur et à mesure' : 'correction à la fin'}`;
     document.getElementById('result-area').classList.add('hidden');
     document.getElementById('menu-container').classList.add('hidden');
     document.getElementById('quiz-form').classList.remove('hidden');
@@ -672,6 +846,8 @@ document.addEventListener('DOMContentLoaded', () => {
     questionPool.push(...shuffle(allQuestions));
     document.getElementById('question-bank-note').textContent =
         `${allQuestions.length} questions disponibles. Les séries parcourent la banque sans répétition avant un nouveau tour.`;
+    renderNumberedSeries();
+    renderThemedSeries();
 
     document.querySelectorAll('[data-series-tab]').forEach((tab, index, tabs) => {
         tab.tabIndex = index === 0 ? 0 : -1;
