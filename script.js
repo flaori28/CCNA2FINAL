@@ -850,7 +850,7 @@ document.addEventListener('DOMContentLoaded', () => {
     renderThemedSeries();
 
     document.querySelectorAll('[data-series-tab]').forEach((tab, index, tabs) => {
-        tab.tabIndex = index === 0 ? 0 : -1;
+        tab.tabIndex = tab.getAttribute('aria-selected') === 'true' ? 0 : -1;
         tab.addEventListener('click', () => selectSeriesTab(tab.dataset.seriesTab));
         tab.addEventListener('keydown', event => {
             const currentIndex = [...tabs].indexOf(tab);

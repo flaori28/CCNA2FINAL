@@ -33,15 +33,15 @@
             <p id="autosave-status" class="autosave-status" role="status" aria-live="polite"></p>
             <div class="series-tabs" role="tablist" aria-label="Choisir la longueur des séries">
                 <button id="tab-long-series" class="series-tab active" type="button" role="tab"
-                    aria-selected="true" aria-controls="panel-long-series" data-series-tab="long">
+                    aria-selected="false" aria-controls="panel-long-series" data-series-tab="long">
                     Séries de 40 ou 60
                 </button>
-                <button id="tab-short-series" class="series-tab" type="button" role="tab"
-                    aria-selected="false" aria-controls="panel-short-series" data-series-tab="short">
+                <button id="tab-short-series" class="series-tab active" type="button" role="tab"
+                    aria-selected="true" aria-controls="panel-short-series" data-series-tab="short">
                     Séries de 10
                 </button>
             </div>
-            <div id="panel-long-series" class="series-tab-panel" role="tabpanel" aria-labelledby="tab-long-series">
+            <div id="panel-long-series" class="series-tab-panel hidden" role="tabpanel" aria-labelledby="tab-long-series">
                 <div class="format-grid">
                     <section class="format-group">
                         <h3>Correction au fur et à mesure</h3>
@@ -73,7 +73,7 @@
                     </section>
                 </div>
             </div>
-            <div id="panel-short-series" class="series-tab-panel hidden" role="tabpanel" aria-labelledby="tab-short-series">
+            <div id="panel-short-series" class="series-tab-panel" role="tabpanel" aria-labelledby="tab-short-series">
                 <section class="series-picker">
                     <label for="series-mode-select">Mode de correction</label>
                     <select id="series-mode-select">
